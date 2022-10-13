@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción Flask</title>
+    <link rel="shortcut icon" type=image/jpg href="../../img/logo/favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=Carrois+Gothic+SC&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <div class="context">
+        <a href="../1/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <a href="../3/index.html">Siguiente</a>
+    </div>
+    <div class="contenido" id="arriba">
+        <p>Flask - Notas</p>
+    </div>
+
+    <h1>2 - Manejando Rutas: Flask Routes</h1>
+    <ol>
+        <li><a href="#1">Generando Nuestras Urls</a></li>
+        <li><a href="#2">Urls Dinámicas con Flask</a></li>
+        <li><a href="#3">Redireccionando rutas (Redirect)</a></li>
+        <li><a href="#4">Creación de URLs (url_for)</a></li>
+        <li><a href="#5">Métodos HTTP en nuestras rutas</a></li>
+    </ol>
+
+    <p id="1">1. Generando Nuestras Urls</p>
+    <pre>
+        - Administrar las Urls
+    - Generarlas de manera dinámica
+    - Usar la función Redirect, urlfor (Propuestas por Flask)
+    - Los Métodos, GET, POST, puerto
+
+    
+    Recordar: El entorno virtual no se puede "CORTAR" y pegar..
+    Es mejor e ideal crear un entorno nuevo, si movemos el proyecto.
+    
+    Otra forma para levantar el servidor (La anterior era python hello.py):
+    
+    <code>
+        # Seteamos las variables de entorno en el archivo .env
+        -FLASK_APP=hello.py
+        -FLASK_ENV=development     -> Al setear el modo development, se activa de manera automática el Debug
+
+        - Ahora con pip install python-dotenv
+            Será la librería encargada de activar el archivo .env
+
+        # Existen otras maneras pero esta es una manera útil
+    </code>
+
+    Eliminamos el archivo hello.py
+
+    <code>
+        # Flask, instancia de nuestro Framework
+        from flask import Flask
+
+        # Hace referencia al archivo que estamos trabajando
+        app = Flask(__name__)
+
+        # Decorador @, expande las funciones de una función
+        @app.route("/hello")
+        def hello():
+            # Metemos código de html a continuación
+            return """
+                < h1 style="font-size: 64px; color: red">Hola!< /h1>
+            """
+
+        if __name__ == '__main__':
+            # Flask se encarga de reiniciar el servidor, debug
+            app.run(debug=True)
+    </code>
+    # Creamos el archivo app.py
+        -> Será el archivo de entrada a la Aplicación
+
+
+    Seteamos nuevamente la variable de entorno:
+        FLASK_APP=app.py
+        FLASK_ENV=development
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="2">2. Urls Dinámicas con Flask</p>
+    <pre>
+        <code>
+        # Le pasamos una Url con un parámetro de manera dinámica
+        # La segunda es para la ruta sola
+        # La primera recibe un tipo entero, que luego lo multiplicamos
+        @app.route("/saludo/< name>/< int:sueldo>")
+        @app.route("/saludo/< name>")
+        @app.route("/saludo/")
+        # Le pasamos el argumento como none
+        def greeting(name=None, sueldo=None):
+            print(name)
+            if name is not None:
+                if sueldo is not None:
+                    return f'< h1 style="font-size: 64px; color: blue">Hola {name}, tu sueldo es: {sueldo*2}< /h1>'
+                # Formato
+                return f'< h1 style="font-size: 64px; color: blue">Hola {name}< /h1>'
+            else:
+                return f'< h1 style="font-size: 64px; color: blue">Hola desconocido< /h1>'        
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="3">3. Redireccionando rutas (Redirect)</p>
+    <pre>
+        <code>
+        # Flask, instancia de nuestro Framework
+        from flask import Flask, redirect
+
+        # Hace referencia al archivo que estamos trabajando
+        app = Flask(__name__)
+
+        @app.route("/")
+        def index():
+            return """
+                < h1 style="font-size: 64px; color: blue">INICIO< /h1>
+            """
+
+        @app.route("/contacto/")
+        def contact():
+            return """
+                < h1 style="font-size: 64px; color: blue">CONTACTO< /h1>
+            """
+
+        @app.route("/nosotros/")
+        def about():
+            return """
+                < h1 style="font-size: 64px; color: blue">NOSOTROS< /h1>
+            """
+
+        # Le pasamos una Url con un parámetro de manera dinámica
+        # La segunda es para la ruta sola
+        # La primera recibe un tipo entero, que luego lo multiplicamos
+        @app.route("/login/< name>")
+        @app.route("/login/")
+        # Le pasamos el argumento como none
+        def login(name=None):
+            print(name)
+            if name is not None:
+                # Si el nombre no es None, lo tenemos y enviamos al dashboard
+                return redirect(f"/dashboard/{name}/")
+            else:
+                return f'< h1 style="font-size: 64px; color: blue">Por favor ingresa tu nombre en la Url< /h1>'
+
+        @app.route("/dashboard/< name>/")
+        @app.route("/dashboard/")
+        def dasboard(name=None):
+            if name is not None:
+                return f'< h1>Bienvenido/a {name} al Dashboard< /h1>'
+            # Si no hay nombre, redirige al Login constantemente
+            return redirect("/login/")
+
+            # return redirect("google.com")     -> Podemos redirigir a otras Urls
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="4">4. Creación de URLs (url_for)</p>
+    <pre>
+        url_for
+        Ahora veremos los redireccionamentos de una función hacia otra función..
+        A travès de toda la aplicación. 
+        De esta manera nos evitamos actualizar línea a línea para redireccionar a futuro..
+    ----------------------------------------------------------
+        <code>
+        from flask import Flask, redirect, url_for
+
+        app = Flask(__name__)
+        
+        @app.route("/")
+        def index():
+            return """
+                < h1 style="font-size: 64px; color: blue">INICIO< /h1>
+            """
+        
+        @app.route("/contacto/")
+        def contact():
+            return """
+                < h1 style="font-size: 64px; color: blue">CONTACTO< /h1>
+            """
+        
+        @app.route("/nosotros/")
+        def about():
+            return """
+                < h1 style="font-size: 64px; color: blue">NOSOTROS< /h1>
+            """
+        
+        @app.route("/ejemplo")
+        def example():
+            # Como parámetro, url_for recibe una función que sea administrada por una Url
+            # Por ejemplo, index(), contact(), about(), de esta manera creamos nuestras rutas
+            # Además podemos pasarle argumentos a dicha función si así lo permitimos desde la construcción de la url
+            # /profile/Hon/?age=25  -> Ahora tendremos un query
+            # print(url_for("dashboard", name="Hon", age="25"))
+        
+            # Debemos re dirigir a la función de las ruta armada, evitando apuntar a la URL.. Si cambia la Url, no habría inconvenientes futuros
+            # Otra ventaja es que escapa los caracteres especiales que vengan de la función..
+            return redirect(url_for("about"))
+        
+        
+        @app.route("/login/< name>")
+        @app.route("/login/")
+        
+        def login(name=None):
+            print(name)
+            if name is not None:
+                # Sumando el url_for
+                return redirect(url_for("dashboard", name=name))
+            else:
+                return f'< h1 style="font-size: 64px; color: blue">Por favor ingresa tu nombre en la Url< /h1>'
+        
+        @app.route("/profile/< name>/")
+        @app.route("/profile/")
+        def dashboard(name=None):
+            if name is not None:
+                return f'< h1>Bienvenido/a {name} al Dashboard< /h1>'
+            
+            # Sumando el url_for
+            return redirect(url_for("login"))
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="5">5. Métodos HTTP en nuestras rutas</p>
+    <pre>
+        GET Y POST      -> El Get por defecto..
+    
+        El formulario no lleva la propiedad Action, ya que se renderizan los datos desde la función donde es renderizada el formulario.
+        
+        <code>
+        from flask import Flask, redirect, url_for, request
+    
+        app = Flask(__name__)
+    
+        @app.route("/")
+        def index():
+            return """
+                < h1 style="font-size: 64px; color: blue">INICIO< /h1>
+            """
+    
+        @app.route("/contacto/")
+        def contact():
+            return """
+                < h1 style="font-size: 64px; color: blue">CONTACTO< /h1>
+            """
+    
+        @app.route("/nosotros/")
+        def about():
+            return """
+                < h1 style="font-size: 64px; color: blue">NOSOTROS< /h1>
+            """
+    
+        @app.route("/ejemplo")
+        def example():
+            return redirect(url_for("about"))
+    
+        # Debemos agregar y especificar los métodos, importamos el request
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+            # De esta manera al hacer post, enviar el formulario, nos vamos al dashboard
+            if request.method == "POST":
+                # request.form["username"]  -> Viene del input del formulario
+                username = request.form["username"]
+                password = request.form["password"]
+                #Recibimos el nombre y la contraseña, debemos validar con la base de datos.
+                print(username, password)
+    
+                # Si el username y el password se encuentran, son true
+                if username and password:
+                    return redirect(url_for("dashboard", name=username))
+            return """
+                < form method="POST" style="background-color: #e6e6e6">
+                    < h3>Ingresa tus datos< /h3>
+                    < input type="text" name="username" /> < br /> < br />
+                    < input type="password" name="password" /> < br /> < br />
+                    < button type="submit"> Enviar < /button>
+                < /form>
+            """
+    
+        @app.route("/profile/< name>/")
+        @app.route("/profile/")
+        def dashboard(name=None):
+            if name is not None:
+                return f'< h1>Bienvenido/a {name} al Dashboard< /h1>'
+            return redirect(url_for("login")) 
+        </code>
+    </pre>
+
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+    
+
+    
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="../1/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <a href="../3/index.html">Siguiente</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción Flask</title>
+    <link rel="shortcut icon" type=image/jpg href="../../img/logo/favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=Carrois+Gothic+SC&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <div class="context">
+        <a href="../3/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <!-- <a href="../2/index.html">Siguiente</a> -->
+    </div>
+    <div class="contenido" id="arriba">
+        <p>Flask - Notas</p>
+    </div>
+
+    <h1>4 - Manejando Formularios y Peticiones: Flas-WTF</h1>
+    <ol>
+        <li><a href="#1">Introducción a Flask-WTF</a></li>
+        <li><a href="#2">Creando nuestras clases de formularios</a></li>
+        <li><a href="#3">Renderizando nuestros formularios</a></li>
+        <li><a href="#4">Conociendo el objeto Request de Flask</a></li>
+        <li><a href="#5">Procesando formularios Flask-WTF</a></li>
+        <li><a href="#6">Agregando estilos a nuestros formularios Flask-WTF</a></li>
+    </ol>
+
+    <p id="1">1. Introducción a Flask-WTF</p>
+    <pre>
+        - Una capa de validación y de seguridad, para que los formularios no sean atacados.
+
+        - https://flask-wtf.readthedocs.io/en/1.0.x/
+
+        CSRF    -> Falsificación de petición en sitios cruzados.    
+                -> Tipo de exploit malicioso, en el que comandos no autorizados son transmitidos por un usuario en el cual el sitio web confia.
+                - Otros nombres: XSRF, enlace hostil, ataque de un clic, secuestro de sesión, y ataque automático.
+
+        Los formularios están expuestos a este tipo de vulnerabilidad..
+
+        Con Flask wtform cubrimos esa vulnerabilidad.
+
+        Instalar:
+            pip instal -U flask-wtf     -> Con la bandera -U, instalamos la última versión.
+
+        Ejemplo:
+        <code>
+            # Instanciamos
+            from flask_wtf import FlaskForm
+            # StringField representa un input de tipo Text
+            from wtforms import StringField
+            # DataRequired, validamos nuestros formularios..
+            from wtforms.validators import DataRequired
+            
+            # Todas nuestas clases deben heredad de la clase FlaskForm
+            class MyForm(FlaskForm):
+                # Propiedad de una clase, el name, representa un input
+                name = StringField('name', validators=[DataRequired()])
+        </code>
+
+        Ejemplo: Forma para renderizarlo
+        <code>
+            < form method="POST" action="/">
+                {{ form.csrf_token }}
+                {{ form.name.label }} {{ form.name(size=20) }}
+                < input type="submit" value="Go">
+            < /form>
+        </code>
+        Ejemplo de uso del Formulario en la vista:
+
+        <code>
+            @app.route('/submit', methods=['GET', 'POST'])
+            def submit():
+                form = MyForm()
+                if form.validate_on_submit():
+                    return redirect('/success')
+                return render_template('submit.html', form=form)
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="2">2. Creando nuestras clases de formularios</p>
+    <pre>
+        Activar el entorno virtual e instalar la librerìa..
+
+        pip install -U flask-wtf
+
+        pip freeze                  -> Para ver las librerìas instaladas
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="3">3. Renderizando nuestros formularios</p>
+    <pre>   
+        - No usaremos Html para el trabajo de los Formularios
+
+        <code>
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+            form = LoginForm()
+            print(form)
+    
+            Podemos instanciar nuestro formulario..
+            < forms.LoginForm object at 0x00000268C2BF2200>  
+    
+        </code>
+        Archivo form.py
+        <code>
+        from flask_wtf import FlaskForm
+        # Acá debajo nos traeremos el tipo de input que usaremos en el formulario
+        from wtforms import StringField, PasswordField, SubmitField
+        # Este tipo de validador dependerá de lo que necesitemos, longitud, caracteres, requerido, igualar contraseñas etc
+        from wtforms.validators import DataRequired, Length
+    
+        class LoginForm(FlaskForm):
+            # El validador en este caso será exigido.. Debe tenerlo
+            username = StringField("Nombre:", validators=[DataRequired(message="Ingresa tu nombre")])
+            password = PasswordField("Contraseña:", validators=[DataRequired(message="Ingresa tu contraseña"), Length(min=4, max=16)])
+            submit = SubmitField("Enviar")
+        </code>
+        --------------------------------
+        Archivo app.py seccion del LoginForm
+        <code>
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+            form = LoginForm()
+            if form.validate_on_submit() and request.method == "POST":
+                username = request.form["username"]
+                password = request.form["password"]
+                print(username, password)
+                if username and password:
+                    session["username"] = username
+                    return redirect(url_for("dashboard", name=username))
+                flash("Por favor ingresa correctamente tus datos.", "error")            
+                # flash("Por favor ingresa correctamente tus datos.", "success")            
+                # flash("Por favor ingresa correctamente tus datos.", "info")            
+    
+            # Le pasamos la instancia del formulario
+            return render_template("login.html", form=form)
+        </code>
+        --------------------------------
+        Archivo login.html
+    
+        <code>
+        {% extends 'base.html' %}    
+
+        {% block content %}
+            < form method="POST" novalidate>
+                < h3>Ingresa tus datos< /h3>
+                
+                < div> 
+                    {{ form.username.label() }}
+                    {{ form.username() }}
+                    {% for error in form.username.errors %}
+                        < li style="color:red;">{{error}}< /li>
+                    {% endfor %}
+                < /div>
+                < br>
+                < div>
+                    {{ form.password.label() }}
+                    {{ form.password() }}
+                    {% for error in form.password.errors %}
+                        < li style="color:red;">{{error}}< /li>
+                    {% endfor %}
+                < /div>
+                < br>
+                < div>
+                    {{ form.submit() }}
+                < /div>
+                
+            < /form>        
+        {% endblock content %}
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="4">4. Conociendo el objeto Request de Flask</p>
+    <pre>
+        Al entrar en http://localhost:5000/login/.. Enviamos una solicitud desde la vista
+
+                    print(request.get_json())
+        O bien  ->  print(request.json)
+
+
+        Si enviamos http://localhost:5000/login/?greetings=hello
+        Si enviamos http://localhost:5000/Login                     -> Tendremos el error si el query no lo envviamos
+
+        Para capturar las query
+        O bien  ->  print(request.args["grretings"])        -> Nos devuelve el error 400
+        O bien  ->  print(request.args.get("grretings"))    -> Devuelve None sino encuentra la url
+        De esta manera recibimos nuestros datos, que nos envian desde un cliente rest hacia el backend..
+
+        Con el método request accedemos a los valores que nos envíen desde la vista.
+        
+        <code>
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+        
+            print(request.get_json())
+            # Otra manera   
+            print(request.json)
+            
+            print(request.args["greetings"])        
+            print(request.args.get("greetings")) 
+        
+            return "Login"
+        
+            # form = LoginForm()
+            # if form.validate_on_submit() and request.method == "POST":
+            #     username = request.form["username"]
+            #     password = request.form["password"]
+            #     print(username, password)
+            #     if username and password:
+            #         session["username"] = username
+            #         return redirect(url_for("dashboard", name=username))
+            #     flash("Por favor ingresa correctamente tus datos.", "error")            
+            #     # flash("Por favor ingresa correctamente tus datos.", "success")            
+            #     # flash("Por favor ingresa correctamente tus datos.", "info")            
+        
+            # # Le pasamos la instancia del formulario
+            # return render_template("login.html", form=form)
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="5">5. Procesando formularios Flask-WTF</p>
+    <pre>
+        {{ form.csrf_token() }}         -> Dentro del form 
+        -  Crea un input de tipo hidden con un token que lo validamos en el servidor cuando se envia desde la vista
+
+        Archivo forms.py
+        <code>
+        from flask_wtf import FlaskForm
+        # Acá debajo nos traeremos el tipo de input que usaremos en el formulario
+        from wtforms import StringField, PasswordField, SubmitField
+        # Este tipo de validador dependerá de lo que necesitemos, longitud, caracteres, requerido, igualar contraseñas etc
+        from wtforms.validators import DataRequired, Length
+
+        class LoginForm(FlaskForm):
+        # El validador en este caso será exigido.. Debe tenerlo
+        username = StringField("Nombre:", validators=[DataRequired(message="Ingresa tu nombre")])
+        password = PasswordField("Contraseña:", 
+        validators=[DataRequired(message="Ingresa tu contraseña"), 
+        Length(min=4, max=16, message="La Contraseña debe tener entre 4 y 16 caracteres")])
+        submit = SubmitField("Enviar")
+                
+        Archivo login.html
+
+        {% extends 'base.html' %}    
+
+
+        {% block content %}
+        < form method="POST" novalidate>
+        < h3>Ingresa tus datos< /h3>
+
+        {{ form.csrf_token() }}
+
+        < div> 
+            {{ form.username.label() }}
+            {{ form.username() }}
+            {% for error in form.username.errors %}
+                < li style="color:red;">{{error}}< /li>
+            {% endfor %}
+        < /div>
+        < br>
+        < div>
+            {{ form.password.label() }}
+            {{ form.password() }}
+            {% for error in form.password.errors %}
+                < li style="color:red;">{{error}}< /li>
+            {% endfor %}
+        < /div>
+        < br>
+        < div>
+            {{ form.submit() }}
+        < /div>
+
+        < /form>        
+        {% endblock content %}
+        </code>
+        
+        Logica del app.py en la ruta de login
+
+        <code>
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+        form = LoginForm()
+        # print(form.username.data)
+        # print(form.password.data)
+        # print(form.validate_on_submit())
+        if form.validate_on_submit() and request.method == "POST":
+        username = form.username.data
+        password = form.password.data
+        print(username, password)
+        if username and password:
+        session["username"] = username
+        return redirect(url_for("dashboard", name=username))
+        flash("Por favor ingresa correctamente tus datos.", "error")            
+        # flash("Por favor ingresa correctamente tus datos.", "success")            
+        # flash("Por favor ingresa correctamente tus datos.", "info")            
+
+        # Le pasamos la instancia del formulario
+        return render_template("login.html", form=form)
+        </code>
+    </pre>
+
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+    <p id="6">6. Agregando estilos a nuestros formularios Flask-WTF</p>
+    <pre>
+        Le pasamos parámetros a la propiedades de las clases de nuestros formularios..
+        (class_="clase_deseada")
+
+        En el archivo login.html
+
+        <code>
+        {% extends 'base.html' %}    
+
+
+        {% block content %}
+            < form method="POST" novalidate>
+                < h3>Ingresa tus datos< /h3>
+                
+                {{ form.csrf_token() }}
+                
+                < div> 
+                    {{ form.username.label(class_="label-form") }}
+                    {{ form.username(class_="input-form") }}
+                    {% for error in form.username.errors %}
+                        < li style="color:red;">{{error}}< /li>
+                    {% endfor %}
+                < /div>
+                < br>
+                < div>
+                    {{ form.password.label(class_="label-form") }}
+                    {{ form.password(class_="input-form") }}
+                    {% for error in form.password.errors %}
+                        < li style="color:red;">{{error}}< /li>
+                    {% endfor %}
+                < /div>
+                < br>
+                < div>
+                    {{ form.submit() }}
+                < /div>
+                
+            < /form>        
+        {% endblock content %}
+
+        </code> 
+        --------------------------------
+        Otras consideraciones:
+            - Apis                  -> Vistas basadas en Clases
+            - Simulacion de Login   -> Librería
+            - Base de Datos         -> MongoDb, libería ORM para hacer peticiones a las bases de datos
+            - Estructura del código -> Blueprint, permite las configuraciones necesarias para hacer el deploy
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+
+    
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="../3/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <!-- <a href="../2/index.html">Siguiente</a> -->
+    </div>
+</body>
+</html>

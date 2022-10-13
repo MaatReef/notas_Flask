@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción Flask</title>
+    <link rel="shortcut icon" type=image/jpg href="../../img/logo/favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=Carrois+Gothic+SC&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <div class="context">
+        <!-- <a href="../0_Atajos/index.html">Volver</a> -->
+        <a href="../../index.html">Inicio</a>
+        <a href="../2/index.html">Siguiente</a>
+    </div>
+    <div class="contenido" id="arriba">
+        <p>Flask - Notas</p>
+    </div>
+
+    <h1>1 - Introducción a Flask</h1>
+    <ol>
+        <li><a href="#1">¿Qué es Flask?</a></li>
+        <li><a href="#2">Configurando nuestro entorno (Windows 10)</a></li>
+        <li><a href="#3">Configurando nuestro entorno Linux (Ubuntu, MacOS)</a></li>
+        <li><a href="#4">Creando un Entorno Virtual</a></li>
+        <li><a href="#5">Instalación de Flask</a></li>
+        <li><a href="#6">Mi Primera Aplicación con Flask</a></li>
+    </ol>
+
+    <p id="1">1. ¿Qué es Flask?</p>
+    <pre>
+        flask.palletsprojects.com       -> 1 gota a la vez..
+
+        Tener python Actualizado..
+        Dependencias: Flask maneja estás dependencias
+            - Werkzeug      - Librerìa standard donde esta basada flask
+            - Jinja         - Motor de renderizado de plantillas, html, css y js, img hacia el frontend
+            - MarkUpSafe    - Utilizado por jinja, escapa los codigo html dentro de las plantillas.. Evita los ataques de inyección
+            - ItsDangerous  - Permite firmar los datos, de un entorno hacia otro entorno de desarrollo.
+            - Click         - Aplicación que permite usar la terminal
+
+        Entornos Virtuales:
+            - Instancia de memoria en la computadora, donde instalamos las dependencias.. 
+            Esas dependencias instaladas son utilizadas en ese entorno virtual.
+
+            De acuerdo a la aplicación, podremos variar la versión de python dentro del entorno virtual.
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="2">2. Configurando nuestro entorno (Windows 10)</p>
+    <pre>
+        - Agregar el path desde el instalador
+
+        - Desde consola  python 
+                        para salir exit()
+        - Para ver la versión y entrar al IDE
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="3">3. Configurando nuestro entorno Linux (Ubuntu, MacOS)</p>
+    <pre>
+        - About
+        -> Getting Started
+
+        -> Installing -> Linux -> Debian o Ubuntu 
+            - sudo apt update                   -> Actualizamos los paquetes
+            - sudo apt install python3.10       -> Instalamos el lenguaje
+            - sudo apt install python3.10-dev   -> 
+            - sudo apt install python3-pip      -> Instalamos pip el manejador de Paquetes
+
+            - python3                           -> Vemos la versión
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="4">4. Creando un Entorno Virtual</p>
+    <pre>
+        - Cada uno de los entornos virtuales tendrá sus versión de Python
+
+        - Virtual Enviroments
+    
+            - venv  -> python3 -m venv /path/
+    
+        Desde la consola:
+            mkdir test   
+            cd .\test\
+            python3 -m venv test
+    
+        Para activar el entorno virtual:
+            - test será el nombre que yo le puse
+            test\Scripts\activate
+    
+            (test)      -> Ahora las dependencias serán instaladas acá, dentro del entorno virtual.
+            -> \ Para imprimir la barra
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="5">5. Instalación de Flask</p>
+    <pre>
+        VsCode  
+
+        pip freeze          -> Para ver que tenemos instalado dentro del entorno virtual
+        pip install flask   -> Instalamos
+        pip freeze          -> Revisamos lo instalado
+    
+        *Ya tenemos el entorno de desarrollo preparado.
+    </pre>
+
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+    <p id="6">6. Mi Primera Aplicación con Flask</p>
+    <pre>
+        Con el entorno activado le pasamos..
+        - python hello.py
+
+        - Abrimos el puerto Running on http://127.0.0.1:5000
+                - @app.route("/hello")
+                - http://127.0.0.1:5000/hello
+
+        - Debugger PIN: 143-310-315     -> Para seguir el error de una manera más detallada
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+
+    
+    <br> 
+    <br> 
+    <div class="context">
+        <!-- <a href="../0_Atajos/index.html">Volver</a> -->
+        <a href="../../index.html">Inicio</a>
+        <a href="../2/index.html">Siguiente</a>
+    </div>
+</body>
+</html>

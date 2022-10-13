@@ -1,0 +1,1005 @@
+1 01-01-que-es-flask
+
+flask.palletsprojects.com       -> 1 gota a la vez..
+
+Tener python Actualizado..
+Dependencias: Flask maneja estás dependencias
+    - Werkzeug      - Librerìa standard donde esta basada flask
+    - Jinja         - Motor de renderizado de plantillas, html, css y js, img hacia el frontend
+    - MarkUpSafe    - Utilizado por jinja, escapa los codigo html dentro de las plantillas.. Evita los ataques de inyección
+    - ItsDangerous  - Permite firmar los datos, de un entorno hacia otro entorno de desarrollo.
+    - Click         - Aplicación que permite usar la terminal
+
+Entornos Virtuales:
+    - Instancia de memoria en la computadora, donde instalamos las dependencias.. 
+    Esas dependencias instaladas son utilizadas en ese entorno virtual.
+
+    De acuerdo a la aplicación, podremos variar la versión de python dentro del entorno virtual.
+
+----------------------------------------------------------
+2 - 01-02-configurando-nuestro-entorno-windows10
+
+    - Agregar el path desde el instalador
+
+    - Desde consola  python 
+                    para salir exit()
+    - Para ver la versión y entrar al IDE
+
+----------------------------------------------------------
+3 - 01-03-configurando-nuestro-entorno-linux
+
+    - About
+        -> Getting Started
+
+        -> Installing -> Linux -> Debian o Ubuntu 
+            - sudo apt update                   -> Actualizamos los paquetes
+            - sudo apt install python3.10       -> Instalamos el lenguaje
+            - sudo apt install python3.10-dev   -> 
+            - sudo apt install python3-pip      -> Instalamos pip el manejador de Paquetes
+
+            - python3                           -> Vemos la versión
+
+----------------------------------------------------------
+4 - 01-04-creando-un-entorno-virtual
+
+    - Cada uno de los entornos virtuales tendrá sus versión de Python
+
+    - Virtual Enviroments
+
+        - venv  -> python3 -m venv /path/
+
+    Desde la consola:
+        mkdir test   
+        cd .\test\
+        python3 -m venv test
+
+    Para activar el entorno virtual:
+        - test será el nombre que yo le puse
+        test\Scripts\activate
+
+        (test)      -> Ahora las dependencias serán instaladas acá, dentro del entorno virtual.
+
+----------------------------------------------------------
+5 - 01-05-instalando-visual-estudio-en-windows-y-linux
+
+    VsCode  
+
+    pip freeze          -> Para ver que tenemos instalado dentro del entorno virtual
+    pip install flask   -> Instalamos
+    pip freeze          -> Revisamos lo instalado
+
+    *Ya tenemos el entorno de desarrollo preparado.
+
+----------------------------------------------------------
+6 - 01-06-mi-primera-aplicacion-con-flask.mp4
+
+    Con el entorno activado le pasamos..
+        - python hello.py
+
+        - Abrimos el puerto Running on http://127.0.0.1:5000
+                - @app.route("/hello")
+                - http://127.0.0.1:5000/hello
+
+        - Debugger PIN: 143-310-315     -> Para seguir el error de una manera más detallada
+
+----------------------------------------------------------
+7 - 02-01-que-es-flask-generando-nuestras-urls.mp4
+
+    - Administrar las Urls
+    - Generarlas de manera dinámica
+    - Usar la función Redirect, urlfor (Propuestas por Flask)
+    - Los Métodos, GET, POST, puerto
+
+    
+    Recordar: El entorno virtual no se puede "CORTAR" y pegar..
+    Es mejor e ideal crear un entorno nuevo, si movemos el proyecto.
+    
+    Otra forma para levantar el servidor (La anterior era python hello.py):
+        
+        # Seteamos las variables de entorno en el archivo .env
+        -FLASK_APP=hello.py
+        -FLASK_ENV=development     -> Al setear el modo development, se activa de manera automática el Debug
+
+        - Ahora con pip install python-dotenv
+            Será la librería encargada de activar el archivo .env
+
+        # Existen otras maneras pero esta es una manera útil
+
+    Eliminamos el archivo hello.py
+        # Flask, instancia de nuestro Framework
+        from flask import Flask
+
+        # Hace referencia al archivo que estamos trabajando
+        app = Flask(__name__)
+
+        # Decorador @, expande las funciones de una función
+        @app.route("/hello")
+        def hello():
+            # Metemos código de html a continuación
+            return """
+                <h1 style="font-size: 64px; color: red">Hola!</h1>
+            """
+
+        if __name__ == '__main__':
+            # Flask se encarga de reiniciar el servidor, debug
+            app.run(debug=True)
+
+    # Creamos el archivo app.py
+        -> Será el archivo de entrada a la Aplicación
+
+
+    Seteamos nuevamente la variable de entorno:
+        FLASK_APP=app.py
+        FLASK_ENV=development
+
+----------------------------------------------------------
+8 - 02-02-URLs-dinámicas-con-Flask
+
+# Le pasamos una Url con un parámetro de manera dinámica
+# La segunda es para la ruta sola
+# La primera recibe un tipo entero, que luego lo multiplicamos
+@app.route("/saludo/<name>/<int:sueldo>")
+@app.route("/saludo/<name>")
+@app.route("/saludo/")
+# Le pasamos el argumento como none
+def greeting(name=None, sueldo=None):
+    print(name)
+    if name is not None:
+        if sueldo is not None:
+            return f'<h1 style="font-size: 64px; color: blue">Hola {name}, tu sueldo es: {sueldo*2}</h1>'
+        # Formato
+        return f'<h1 style="font-size: 64px; color: blue">Hola {name}</h1>'
+    else:
+        return f'<h1 style="font-size: 64px; color: blue">Hola desconocido</h1>'
+
+
+----------------------------------------------------------
+9 - 02-03-redireccionando-rutas.mp4
+
+# Flask, instancia de nuestro Framework
+from flask import Flask, redirect
+
+# Hace referencia al archivo que estamos trabajando
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return """
+        <h1 style="font-size: 64px; color: blue">INICIO</h1>
+    """
+
+@app.route("/contacto/")
+def contact():
+    return """
+        <h1 style="font-size: 64px; color: blue">CONTACTO</h1>
+    """
+
+@app.route("/nosotros/")
+def about():
+    return """
+        <h1 style="font-size: 64px; color: blue">NOSOTROS</h1>
+    """
+
+# Le pasamos una Url con un parámetro de manera dinámica
+# La segunda es para la ruta sola
+# La primera recibe un tipo entero, que luego lo multiplicamos
+@app.route("/login/<name>")
+@app.route("/login/")
+# Le pasamos el argumento como none
+def login(name=None):
+    print(name)
+    if name is not None:
+        # Si el nombre no es None, lo tenemos y enviamos al dashboard
+        return redirect(f"/dashboard/{name}/")
+    else:
+        return f'<h1 style="font-size: 64px; color: blue">Por favor ingresa tu nombre en la Url</h1>'
+
+@app.route("/dashboard/<name>/")
+@app.route("/dashboard/")
+def dasboard(name=None):
+    if name is not None:
+        return f'<h1>Bienvenido/a {name} al Dashboard</h1>'
+    # Si no hay nombre, redirige al Login constantemente
+    return redirect("/login/")
+
+    # return redirect("google.com")     -> Podemos redirigir a otras Urls
+
+
+----------------------------------------------------------
+10 - 02-04-creacion-de-urls.mp4
+    url_for
+        Ahora veremos los redireccionamentos de una función hacia otra función..
+        A travès de toda la aplicación. 
+        De esta manera nos evitamos actualizar línea a línea para redireccionar a futuro..
+    ----------------------------------------------------------
+        from flask import Flask, redirect, url_for
+
+        app = Flask(__name__)
+        
+        @app.route("/")
+        def index():
+            return """
+                <h1 style="font-size: 64px; color: blue">INICIO</h1>
+            """
+        
+        @app.route("/contacto/")
+        def contact():
+            return """
+                <h1 style="font-size: 64px; color: blue">CONTACTO</h1>
+            """
+        
+        @app.route("/nosotros/")
+        def about():
+            return """
+                <h1 style="font-size: 64px; color: blue">NOSOTROS</h1>
+            """
+        
+        @app.route("/ejemplo")
+        def example():
+            # Como parámetro, url_for recibe una función que sea administrada por una Url
+            # Por ejemplo, index(), contact(), about(), de esta manera creamos nuestras rutas
+            # Además podemos pasarle argumentos a dicha función si así lo permitimos desde la construcción de la url
+            # /profile/Hon/?age=25  -> Ahora tendremos un query
+            # print(url_for("dashboard", name="Hon", age="25"))
+        
+            # Debemos re dirigir a la función de las ruta armada, evitando apuntar a la URL.. Si cambia la Url, no habría inconvenientes futuros
+            # Otra ventaja es que escapa los caracteres especiales que vengan de la función..
+            return redirect(url_for("about"))
+        
+        
+        @app.route("/login/<name>")
+        @app.route("/login/")
+        
+        def login(name=None):
+            print(name)
+            if name is not None:
+                # Sumando el url_for
+                return redirect(url_for("dashboard", name=name))
+            else:
+                return f'<h1 style="font-size: 64px; color: blue">Por favor ingresa tu nombre en la Url</h1>'
+        
+        @app.route("/profile/<name>/")
+        @app.route("/profile/")
+        def dashboard(name=None):
+            if name is not None:
+                return f'<h1>Bienvenido/a {name} al Dashboard</h1>'
+            
+            # Sumando el url_for
+            return redirect(url_for("login"))
+----------------------------------------------------------
+11 - 02-05-metodos-http-en-nuestras-rutas.mp4
+
+    GET Y POST      -> El Get por defecto..
+    
+    El formulario no lleva la propiedad Action, ya que se renderizan los datos desde la función donde es renderizada el formulario.
+
+    from flask import Flask, redirect, url_for, request
+
+    app = Flask(__name__)
+
+    @app.route("/")
+    def index():
+        return """
+            <h1 style="font-size: 64px; color: blue">INICIO</h1>
+        """
+
+    @app.route("/contacto/")
+    def contact():
+        return """
+            <h1 style="font-size: 64px; color: blue">CONTACTO</h1>
+        """
+
+    @app.route("/nosotros/")
+    def about():
+        return """
+            <h1 style="font-size: 64px; color: blue">NOSOTROS</h1>
+        """
+
+    @app.route("/ejemplo")
+    def example():
+        return redirect(url_for("about"))
+
+    # Debemos agregar y especificar los métodos, importamos el request
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        # De esta manera al hacer post, enviar el formulario, nos vamos al dashboard
+        if request.method == "POST":
+            # request.form["username"]  -> Viene del input del formulario
+            username = request.form["username"]
+            password = request.form["password"]
+            #Recibimos el nombre y la contraseña, debemos validar con la base de datos.
+            print(username, password)
+
+            # Si el username y el password se encuentran, son true
+            if username and password:
+                return redirect(url_for("dashboard", name=username))
+        return """
+            <form method="POST" style="background-color: #e6e6e6">
+                <h3>Ingresa tus datos</h3>
+                <input type="text" name="username" /> <br /> <br />
+                <input type="password" name="password" /> <br /> <br />
+                <button type="submit"> Enviar </button>
+            </form>
+        """
+
+    @app.route("/profile/<name>/")
+    @app.route("/profile/")
+    def dashboard(name=None):
+        if name is not None:
+            return f'<h1>Bienvenido/a {name} al Dashboard</h1>'
+        return redirect(url_for("login")) 
+
+----------------------------------------------------------
+12 - 03-01-introduccion-a-jinja2.mp4.mp4
+
+    - pip freeze    -> Para ver la lista de las dependencias instaladas.
+
+    Jinja2==3.1.2       -> Es la que veremos.
+    https://jinja.palletsprojects.com/en/3.1.x/
+    
+    
+    Jinja Se instala y administra cuando instalamos Flask
+    Templates:
+    https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+    Ejemplo: En sí es código python dentro de Html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <title>My Webpage</title>
+    </head>
+    <body>
+        <ul id="navigation">
+        {% for item in navigation %}    -> Recorriendo una diccionario (Podría ser una lista)
+            
+            <li><a href="{{ item.href }}">{{ item.caption }}</a></li>       -> Reccoremos a las propiedades de ese diccionario
+
+        {% endfor %}                    -> Cerramos la estuctura de control
+        </ul>
+
+        <h1>My Webpage</h1>
+        {{ a_variable }}                -> Para imprimir las variables de nuestro servidor Flask hacia nuestras plantillas
+
+        {# a comment #}
+    </body>
+    </html>
+
+    --------------------------------
+    {% ... %} for Statements
+
+    {{ ... }} for Expressions to print to the template output
+
+    {# ... #} for Comments not included in the template output
+----------------------------------------------------------
+13 - 03-02-renderizando-nuestra primera-página-HTML
+    Ahora renderizaremos nuestras plantillas html desde el servidor hacia al navegador.
+    render_template("archivo.html")     -> La función busca en la carpeta template que estará en la raíz de nuestro proyecto.
+                                        - Mismo nivel para el archivo de entrada a la aplicación app.py, en este caso.
+
+
+    Creamos el archivo index.html dentro de la carpeta templates
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fundamentos Flask</title>
+    </head>
+    <body>
+
+        <!-- menu -->
+        <div class="container">
+            <ul class="menu">
+                <li><a href="">Inicio</a></li>
+                <li><a href="">Contacto</a></li>
+                <li><a href="">Nosotros</a></li>
+                <li><a href="">Ingresar</a></li>
+                <li><a href="">Registrarse</a></li>
+            </ul>
+            <main>
+                <h1>Fundamentos de Flask</h1>                        
+            </main>
+        </div>
+
+    </body>
+    </html>
+
+    --------------------------------
+    En el arcivo app.py
+
+    from flask import Flask, redirect, url_for, request, render_template
+
+    app = Flask(__name__)
+
+    @app.route("/")
+    def index():
+        #Importamos el render desde Flask y le pasamos el archivo que se encuentra en la carpeta templates
+        return render_template("index.html")
+
+    @app.route("/contacto/")
+    def contact():
+        return """
+            <h1 style="font-size: 64px; color: blue">CONTACTO</h1>
+        """
+
+    @app.route("/nosotros/")
+    def about():
+        return """
+            <h1 style="font-size: 64px; color: blue">NOSOTROS</h1>
+        """
+
+    @app.route("/ejemplo")
+    def example():
+        return redirect(url_for("about"))
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        if request.method == "POST":
+            username = request.form["username"]
+            password = request.form["password"]
+            print(username, password)
+
+            if username and password:
+                return redirect(url_for("dashboard", name=username))
+        return """
+            <form method="POST" style="background-color: #e6e6e6">
+                <h3>Ingresa tus datos</h3>
+                <input type="text" name="username" /> <br /> <br />
+                <input type="password" name="password" /> <br /> <br />
+                <button type="submit"> Enviar </button>
+            </form>
+        """
+
+    @app.route("/profile/<name>/")
+    @app.route("/profile/")
+    def dashboard(name=None):
+        if name is not None:
+            return f'<h1>Bienvenido/a {name} al Dashboard</h1>'
+        return redirect(url_for("login")) 
+
+----------------------------------------------------------
+14 - 03-03-manejando-archivos-estaticos.mp4
+    Los archivos estáticos serán los archivos css, js, e imágenes.. Desde nuestro servidor lo renderizamos hacia nuestro navegador.
+
+    Creamos una carpeta donde estarán todos los archivos estáticos..
+    La carpeta se DEBE llamar static y estar a la misma altura de la carpeta templates y el archivo app.py
+
+    static (carpeta)
+        -> css (carpeta) -> Este es el archivo css del proyecto
+        -> imgs
+        -> js
+    --------------------------------
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fundamentos Flask</title>
+        <!-- <link rel="stylesheet" href="../static/css/styles.css"> -->
+        <!-- Así vinculamos con Jinja -->
+        <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+    </head>
+    <body>
+
+        <!-- menu -->
+        <div class="container">
+            <nav class="menu">
+                <img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                <ul class="menu-links">
+                    <li><a href="">Inicio</a></li>
+                    <li><a href="">Contacto</a></li>
+                    <li><a href="">Nosotros</a></li>
+                    <li><a href="">Ingresar</a></li>
+                    <li><a href="">Registrarse</a></li>
+                </ul>
+            </nav>
+
+            <main>
+                <h1>Fundamentos de Flask</h1>                        
+            </main>
+        </div>
+
+        <script src="{{url_for('static', filename='js/main.js')}}"></script>
+    </body>
+    </html>
+
+----------------------------------------------------------
+15 - 03-04-generando-html-dinamico.mp4
+    Ahora comenzamos a renderizar páginas combinadas con las variables que podemos recibir tales com el nombre y demás..
+
+    --------------------------------
+    Creamos el Dashboard:
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fundamentos de Flask</title>
+        <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+
+    </head>
+    <body>
+        <!-- menu -->
+        <div class="container">
+            <nav class="menu">
+                <img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                <ul class="menu-links">
+                    <li><a href="">Inicio</a></li>
+                    <li><a href="">Contacto</a></li>
+                    <li><a href="">Nosotros</a></li>
+                
+                    {% if username %}
+                        <li><a href="">{{ username }}</a></li>
+                        <li><a href="">Logout</a></li>
+                    {% else %}
+                        <li><a href="">Ingresar</a></li>
+                        <li><a href="">Registrarse</a></li>
+                    {% endif %}
+                    
+                </ul>
+            </nav>
+
+            <main>
+                <h1>Bienvenido/a al Dashboard</h1>                    
+            </main>
+        </div>
+        
+        
+
+    </body>
+    </html>
+
+
+
+----------------------------------------------------------
+16 - 03-05-mensajes-flashing.mp4
+
+    from flask import Flask, redirect, url_for, request, render_template, \
+    flash
+
+    con el \ podemos desbordar el código a la siguiente línea
+
+    from flask import Flask, redirect, url_for, request, render_template, \
+    flash
+
+    app = Flask(__name__)
+    app.config["SECRET_KEY"] = "so-secret!"
+
+    @app.route("/")
+    def index():
+        #Importamos el render desde Flask y le pasamos el archivo que se encuentra en la carpeta templates
+        return render_template("index.html")
+
+    @app.route("/contacto/")
+    def contact():
+        return """
+            <h1 style="font-size: 64px; color: blue">CONTACTO</h1>
+        """
+
+    @app.route("/nosotros/")
+    def about():
+        return """
+            <h1 style="font-size: 64px; color: blue">NOSOTROS</h1>
+        """
+
+    @app.route("/ejemplo")
+    def example():
+        return redirect(url_for("about"))
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        if request.method == "POST":
+            username = request.form["username"]
+            password = request.form["password"]
+            print(username, password)
+            if username and password:
+                return redirect(url_for("dashboard", name=username))
+            flash("Por favor ingresa correctamente tus datos.", "error")            
+            # flash("Por favor ingresa correctamente tus datos.", "success")            
+            # flash("Por favor ingresa correctamente tus datos.", "info")            
+            # Manejo de los mensajes Flash
+
+        return render_template("login.html")
+
+    @app.route("/profile/<name>/")
+    @app.route("/profile/")
+    def dashboard(name=None):
+        if name is not None:
+            flash(f"Bievenido/a {name}", "success")
+            return render_template("dashboard.html", username=name)
+        return redirect(url_for("login")) 
+
+    --------------------------------
+                        Manejamos los mensajes flash dentro del Html
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Fundamentos de Flask</title>
+        <link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+
+    </head>
+    <body>
+        <!-- menu -->
+        <div class="container">
+            <nav class="menu">
+                <img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                <ul class="menu-links">
+                    <li><a href="">Inicio</a></li>
+                    <li><a href="">Contacto</a></li>
+                    <li><a href="">Nosotros</a></li>
+                
+                    {% if username %}
+                        <li><a href="">{{ username }}</a></li>
+                        <li><a href="">Logout</a></li>
+                    {% else %}
+                        <li><a href="">Ingresar</a></li>
+                        <li><a href="">Registrarse</a></li>
+                    {% endif %}
+
+                </ul>
+            </nav>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="messages">
+                        {% for message in messages %}
+                            <li class="success">{{message}}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
+            <main>
+                <h1>Bienvenido/a al Dashboard</h1>                    
+            </main>
+        </div>
+        
+        
+
+    </body>
+    </html>
+
+----------------------------------------------------------
+17 - 03-06-heredando-plantillas-html.mp4
+
+Un bloque sirve para heredar data de una plantilla hacia nuestra plantilla.
+
+Ejemplo desde un archivo base.html:
+
+<main>
+    {% block content %}
+                              
+    {% endblock content %}
+</main>
+
+Desde otro archivo dashboard.html: 
+
+{% block content %}
+    <h1>Fundamentos de Flask</h1>                        
+{% endblock content %}
+
+Podemos entonces meter data desde varias archivos de manera dinámica
+
+----------------------------------------------------------
+18 - 04-01-introduccion-a-flask-wtform.mp4
+
+    - Una capa de validación y de seguridad, para que los formularios no sean atacados.
+
+    - https://flask-wtf.readthedocs.io/en/1.0.x/
+
+    CSRF    -> Falsificación de petición en sitios cruzados.    
+            -> Tipo de exploit malicioso, en el que comandos no autorizados son transmitidos por un usuario en el cual el sitio web confia.
+            - Otros nombres: XSRF, enlace hostil, ataque de un clic, secuestro de sesión, y ataque automático.
+
+    Los formularios están expuestos a este tipo de vulnerabilidad..
+
+    Con Flask wtform cubrimos esa vulnerabilidad.
+
+    Instalar:
+        pip instal -U flask-wtf     -> Con la bandera -U, instalamos la última versión.
+
+    Ejemplo:
+
+        # Instanciamos
+        from flask_wtf import FlaskForm
+        # StringField representa un input de tipo Text
+        from wtforms import StringField
+        # DataRequired, validamos nuestros formularios..
+        from wtforms.validators import DataRequired
+        
+        # Todas nuestas clases deben heredad de la clase FlaskForm
+        class MyForm(FlaskForm):
+            # Propiedad de una clase, el name, representa un input
+            name = StringField('name', validators=[DataRequired()])
+ 
+
+    Ejemplo: Forma para renderizarlo
+        <form method="POST" action="/">
+            {{ form.csrf_token }}
+            {{ form.name.label }} {{ form.name(size=20) }}
+            <input type="submit" value="Go">
+        </form>
+
+    Ejemplo de uso del Formulario en la vista:
+
+        @app.route('/submit', methods=['GET', 'POST'])
+        def submit():
+            form = MyForm()
+            if form.validate_on_submit():
+                return redirect('/success')
+            return render_template('submit.html', form=form)
+
+        
+    
+----------------------------------------------------------
+19 - 04-02-creando-nuestras-clases-de-formularios.mp4
+
+    Activar el entorno virtual e instalar la librerìa..
+
+        pip install -U flask-wtf
+
+        pip freeze                  -> Para ver las librerìas instaladas
+
+        
+----------------------------------------------------------
+20 - 04-03-renderizando-nuestros-formularios.mp4
+
+    - No usaremos Html para el trabajo de los Formularios
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        form = LoginForm()
+        print(form)
+
+        Podemos instanciar nuestro formulario..
+        <forms.LoginForm object at 0x00000268C2BF2200>  
+
+
+    Archivo form.py
+
+    from flask_wtf import FlaskForm
+    # Acá debajo nos traeremos el tipo de input que usaremos en el formulario
+    from wtforms import StringField, PasswordField, SubmitField
+    # Este tipo de validador dependerá de lo que necesitemos, longitud, caracteres, requerido, igualar contraseñas etc
+    from wtforms.validators import DataRequired, Length
+
+    class LoginForm(FlaskForm):
+        # El validador en este caso será exigido.. Debe tenerlo
+        username = StringField("Nombre:", validators=[DataRequired(message="Ingresa tu nombre")])
+        password = PasswordField("Contraseña:", validators=[DataRequired(message="Ingresa tu contraseña"), Length(min=4, max=16)])
+        submit = SubmitField("Enviar")
+    
+    --------------------------------
+    Archivo app.py seccion del LoginForm
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        form = LoginForm()
+        if form.validate_on_submit() and request.method == "POST":
+            username = request.form["username"]
+            password = request.form["password"]
+            print(username, password)
+            if username and password:
+                session["username"] = username
+                return redirect(url_for("dashboard", name=username))
+            flash("Por favor ingresa correctamente tus datos.", "error")            
+            # flash("Por favor ingresa correctamente tus datos.", "success")            
+            # flash("Por favor ingresa correctamente tus datos.", "info")            
+
+        # Le pasamos la instancia del formulario
+        return render_template("login.html", form=form)
+
+        --------------------------------
+        Archivo login.html
+
+        {% extends 'base.html' %}    
+
+        {% block content %}
+            <form method="POST" novalidate>
+                <h3>Ingresa tus datos</h3>
+                
+                <div> 
+                    {{ form.username.label() }}
+                    {{ form.username() }}
+                    {% for error in form.username.errors %}
+                        <li style="color:red;">{{error}}</li>
+                    {% endfor %}
+                </div>
+                <br>
+                <div>
+                    {{ form.password.label() }}
+                    {{ form.password() }}
+                    {% for error in form.password.errors %}
+                        <li style="color:red;">{{error}}</li>
+                    {% endfor %}
+                </div>
+                <br>
+                <div>
+                    {{ form.submit() }}
+                </div>
+                
+            </form>        
+        {% endblock content %}
+
+----------------------------------------------------------
+21 - 04-04-conociendo-el-objeto-request-de-flask.mp4
+
+    Al entrar en http://localhost:5000/login/.. Enviamos una solicitud desde la vista
+
+                print(request.get_json())
+    O bien  ->  print(request.json)
+
+
+    Si enviamos http://localhost:5000/login/?greetings=hello
+    Si enviamos http://localhost:5000/Login                     -> Tendremos el error si el query no lo envviamos
+
+    Para capturar las query
+    O bien  ->  print(request.args["grretings"])        -> Nos devuelve el error 400
+    O bien  ->  print(request.args.get("grretings"))    -> Devuelve None sino encuentra la url
+    De esta manera recibimos nuestros datos, que nos envian desde un cliente rest hacia el backend..
+
+    Con el método request accedemos a los valores que nos envíen desde la vista.
+    
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+    
+        print(request.get_json())
+        # Otra manera   
+        print(request.json)
+        
+        print(request.args["greetings"])        
+        print(request.args.get("greetings")) 
+    
+        return "Login"
+    
+        # form = LoginForm()
+        # if form.validate_on_submit() and request.method == "POST":
+        #     username = request.form["username"]
+        #     password = request.form["password"]
+        #     print(username, password)
+        #     if username and password:
+        #         session["username"] = username
+        #         return redirect(url_for("dashboard", name=username))
+        #     flash("Por favor ingresa correctamente tus datos.", "error")            
+        #     # flash("Por favor ingresa correctamente tus datos.", "success")            
+        #     # flash("Por favor ingresa correctamente tus datos.", "info")            
+    
+        # # Le pasamos la instancia del formulario
+        # return render_template("login.html", form=form)
+
+----------------------------------------------------------
+22 - 04-05-procesando-formularios-flask-wtf.mp4
+
+{{ form.csrf_token() }}         -> Dentro del form 
+                                -  Crea un input de tipo hidden con un token que lo validamos en el servidor cuando se envia desde la vista
+            
+    Archivo forms.py
+
+    from flask_wtf import FlaskForm
+    # Acá debajo nos traeremos el tipo de input que usaremos en el formulario
+    from wtforms import StringField, PasswordField, SubmitField
+    # Este tipo de validador dependerá de lo que necesitemos, longitud, caracteres, requerido, igualar contraseñas etc
+    from wtforms.validators import DataRequired, Length
+    
+    class LoginForm(FlaskForm):
+        # El validador en este caso será exigido.. Debe tenerlo
+        username = StringField("Nombre:", validators=[DataRequired(message="Ingresa tu nombre")])
+        password = PasswordField("Contraseña:", 
+                    validators=[DataRequired(message="Ingresa tu contraseña"), 
+                    Length(min=4, max=16, message="La Contraseña debe tener entre 4 y 16 caracteres")])
+        submit = SubmitField("Enviar")
+                                
+    Archivo login.html
+
+    {% extends 'base.html' %}    
+
+
+    {% block content %}
+        <form method="POST" novalidate>
+            <h3>Ingresa tus datos</h3>
+            
+            {{ form.csrf_token() }}
+            
+            <div> 
+                {{ form.username.label() }}
+                {{ form.username() }}
+                {% for error in form.username.errors %}
+                    <li style="color:red;">{{error}}</li>
+                {% endfor %}
+            </div>
+            <br>
+            <div>
+                {{ form.password.label() }}
+                {{ form.password() }}
+                {% for error in form.password.errors %}
+                    <li style="color:red;">{{error}}</li>
+                {% endfor %}
+            </div>
+            <br>
+            <div>
+                {{ form.submit() }}
+            </div>
+            
+        </form>        
+    {% endblock content %}
+
+    Logica del app.py en la ruta de login
+
+    @app.route("/login/", methods=["GET", "POST"])
+    def login():
+        form = LoginForm()
+        # print(form.username.data)
+        # print(form.password.data)
+        # print(form.validate_on_submit())
+        if form.validate_on_submit() and request.method == "POST":
+            username = form.username.data
+            password = form.password.data
+            print(username, password)
+            if username and password:
+                session["username"] = username
+                return redirect(url_for("dashboard", name=username))
+            flash("Por favor ingresa correctamente tus datos.", "error")            
+            # flash("Por favor ingresa correctamente tus datos.", "success")            
+            # flash("Por favor ingresa correctamente tus datos.", "info")            
+
+        # Le pasamos la instancia del formulario
+        return render_template("login.html", form=form)
+                                                                
+----------------------------------------------------------
+23 - 04-06-agregando-estilos-a-nuestros-formularios-flask-wtf.mp4
+
+    Le pasamos parámetros a la propiedades de las clases de nuestros formularios..
+    (class_="clase_deseada")
+
+    En el archivo login.html
+
+    {% extends 'base.html' %}    
+
+
+    {% block content %}
+        <form method="POST" novalidate>
+            <h3>Ingresa tus datos</h3>
+            
+            {{ form.csrf_token() }}
+            
+            <div> 
+                {{ form.username.label(class_="label-form") }}
+                {{ form.username(class_="input-form") }}
+                {% for error in form.username.errors %}
+                    <li style="color:red;">{{error}}</li>
+                {% endfor %}
+            </div>
+            <br>
+            <div>
+                {{ form.password.label(class_="label-form") }}
+                {{ form.password(class_="input-form") }}
+                {% for error in form.password.errors %}
+                    <li style="color:red;">{{error}}</li>
+                {% endfor %}
+            </div>
+            <br>
+            <div>
+                {{ form.submit() }}
+            </div>
+            
+        </form>        
+    {% endblock content %}
+
+
+    --------------------------------
+    Otras consideraciones:
+        - Apis                  -> Vistas basadas en Clases
+        - Simulacion de Login   -> Librería
+        - Base de Datos         -> MongoDb, libería ORM para hacer peticiones a las bases de datos
+        - Estructura del código -> Blueprint, permite las configuraciones necesarias para hacer el deploy
+    
+----------------------------------------------------------

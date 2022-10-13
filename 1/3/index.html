@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción Flask</title>
+    <link rel="shortcut icon" type=image/jpg href="../../img/logo/favicon.ico"/>
+    <link href="https://fonts.googleapis.com/css2?family=Carrois+Gothic+SC&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+    <div class="context">
+        <a href="../2/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <a href="../4/index.html">Siguiente</a>
+    </div>
+    <div class="contenido" id="arriba">
+        <p>Flask - Notas</p>
+    </div>
+
+    <h1>3 - Renderizando HTML en nuesra aplicación web: JINJA 2</h1>
+    <ol>
+        <li><a href="#1">Introducción a Jinja2</a></li>
+        <li><a href="#2">Renderizando nuestra primera Página Html</a></li>
+        <li><a href="#3">Manejando archivos Estáticos (Js, Css, IMG)</a></li>
+        <li><a href="#4">Generando Html Dinámico (Jinja2)</a></li>
+        <li><a href="#5">Mensajes Flashing (Exito, Error, Info)</a></li>
+        <li><a href="#6">Heredando Plantillas Html (DRY)</a></li>
+    </ol>
+
+    <p id="1">1. Introducción a Jinja2</p>
+    <pre>
+        - pip freeze    -> Para ver la lista de las dependencias instaladas.
+
+        Jinja2==3.1.2       -> Es la que veremos.
+        https://jinja.palletsprojects.com/en/3.1.x/
+        
+        
+        Jinja Se instala y administra cuando instalamos Flask
+        Templates:
+        https://jinja.palletsprojects.com/en/3.1.x/templates/
+
+        Ejemplo: En sí es código python dentro de Html
+        <code>
+        < !DOCTYPE html>
+        < html lang="en">
+        < head>
+            < title>My Webpage< /title>
+        < /head>
+        < body>
+            < ul id="navigation">
+            {% for item in navigation %}    -> Recorriendo una diccionario (Podría ser una lista)
+                
+                < li>< a href="{{ item.href }}">{{ item.caption }}< /a>< /li>       -> Reccoremos a las propiedades de ese diccionario
+
+            {% endfor %}                    -> Cerramos la estuctura de control
+            < /ul>
+
+            < h1>My Webpage< /h1>
+            {{ a_variable }}                -> Para imprimir las variables de nuestro servidor Flask hacia nuestras plantillas
+
+            {# a comment #}
+        < /body>
+        < /html>
+        </code>
+        --------------------------------
+        {% ... %} for Statements
+
+        {{ ... }} for Expressions to print to the template output
+
+        {# ... #} for Comments not included in the template output
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="2">2. Renderizando nuestra primera Página Html</p>
+    <pre>
+        Ahora renderizaremos nuestras plantillas html desde el servidor hacia al navegador.
+        render_template("archivo.html")     -> La función busca en la carpeta template que estará en la raíz de nuestro proyecto.
+                                            - Mismo nivel para el archivo de entrada a la aplicación app.py, en este caso.
+    
+    
+        Creamos el archivo index.html dentro de la carpeta templates
+        <code>
+        < !DOCTYPE html>
+        < html lang="en">
+        < head>
+            < meta charset="UTF-8">
+            < meta http-equiv="X-UA-Compatible" content="IE=edge">
+            < meta name="viewport" content="width=device-width, initial-scale=1.0">
+            < title>Fundamentos Flask< /title>
+        < /head>
+        < body>
+    
+            <!-- menu -->
+            < div class="container">
+                < ul class="menu">
+                    < li>< a href="">Inicio< /a>< /li>
+                    < li>< a href="">Contacto< /a>< /li>
+                    < li>< a href="">Nosotros< /a>< /li>
+                    < li>< a href="">Ingresar< /a>< /li>
+                    < li>< a href="">Registrarse< /a>< /li>
+                < /ul>
+                < main>
+                    < h1>Fundamentos de Flask< /h1>                        
+                < /main>
+            < /div>
+    
+        < /body>
+        < /html>
+        </code>
+        --------------------------------
+        En el arcivo app.py
+        
+        <code>
+        from flask import Flask, redirect, url_for, request, render_template
+    
+        app = Flask(__name__)
+    
+        @app.route("/")
+        def index():
+            #Importamos el render desde Flask y le pasamos el archivo que se encuentra en la carpeta templates
+            return render_template("index.html")
+    
+        @app.route("/contacto/")
+        def contact():
+            return """
+                < h1 style="font-size: 64px; color: blue">CONTACTO< /h1>
+            """
+    
+        @app.route("/nosotros/")
+        def about():
+            return """
+                < h1 style="font-size: 64px; color: blue">NOSOTROS< /h1>
+            """
+    
+        @app.route("/ejemplo")
+        def example():
+            return redirect(url_for("about"))
+    
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+            if request.method == "POST":
+                username = request.form["username"]
+                password = request.form["password"]
+                print(username, password)
+    
+                if username and password:
+                    return redirect(url_for("dashboard", name=username))
+            return """
+                < form method="POST" style="background-color: #e6e6e6">
+                    < h3>Ingresa tus datos< /h3>
+                    < input type="text" name="username" /> < br /> < br />
+                    < input type="password" name="password" /> < br /> < br />
+                    < button type="submit"> Enviar < /button>
+                < /form>
+            """
+    
+        @app.route("/profile/< name>/")
+        @app.route("/profile/")
+        def dashboard(name=None):
+            if name is not None:
+                return f'< h1>Bienvenido/a {name} al Dashboard< /h1>'
+            return redirect(url_for("login"))     
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="3">3. Manejando archivos Estáticos (Js, Css, IMG)</p>
+    <pre>
+        Los archivos estáticos serán los archivos css, js, e imágenes.. Desde nuestro servidor lo renderizamos hacia nuestro navegador.
+
+        Creamos una carpeta donde estarán todos los archivos estáticos..
+        La carpeta se DEBE llamar static y estar a la misma altura de la carpeta templates y el archivo app.py
+
+        static (carpeta)
+            -> css (carpeta) -> Este es el archivo css del proyecto
+            -> imgs
+            -> js
+        --------------------------------
+        <code>
+        < !DOCTYPE html>
+        < html lang="en">
+        < head>
+            < meta charset="UTF-8">
+            < meta http-equiv="X-UA-Compatible" content="IE=edge">
+            < meta name="viewport" content="width=device-width, initial-scale=1.0">
+            < title>Fundamentos Flask< /title>
+            <!-- <link rel="stylesheet" href="../static/css/styles.css"> -->
+            <!-- Así vinculamos con Jinja -->
+            < link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+        < /head>
+        < body>
+
+            <!-- menu -->
+            < div class="container">
+                < nav class="menu">
+                    < img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                    < ul class="menu-links">
+                        < li>< a href="">Inicio< /a>< /li>
+                        < li>< a href="">Contacto< /a>< /li>
+                        < li>< a href="">Nosotros< /a>< /li>
+                        < li>< a href="">Ingresar< /a>< /li>
+                        < li>< a href="">Registrarse< /a>< /li>
+                    < /ul>
+                < /nav>
+
+                < main>
+                    < h1>Fundamentos de Flask< /h1>                        
+                < /main>
+            < /div>
+
+            < script src="{{url_for('static', filename='js/main.js')}}"> </script>
+        < /body>
+        < /html>
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="4">4. Generando Html Dinámico (Jinja2)</p>
+    <pre>
+        Ahora comenzamos a renderizar páginas combinadas con las variables que podemos recibir tales com el nombre y demás..
+
+        --------------------------------
+        Creamos el Dashboard:
+        <code>
+        < !DOCTYPE html>
+        < html lang="en">
+        < head>
+            < meta charset="UTF-8">
+            < meta http-equiv="X-UA-Compatible" content="IE=edge">
+            < meta name="viewport" content="width=device-width, initial-scale=1.0">
+            < title>Fundamentos de Flask< /title>
+            < link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+    
+        < /head>
+        < body>
+            <!-- menu -->
+            < div class="container">
+                < nav class="menu">
+                    < img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                    < ul class="menu-links">
+                        < li>< a href="">Inicio< /a>< /li>
+                        < li>< a href="">Contacto< /a>< /li>
+                        < li>< a href="">Nosotros< /a>< /li>
+                    
+                        {% if username %}
+                            < li>< a href="">{{ username }}< /a>< /li>
+                            < li>< a href="">Logout< /a>< /li>
+                        {% else %}
+                            < li>< a href="">Ingresar< /a>< /li>
+                            < li>< a href="">Registrarse< /a>< /li>
+                        {% endif %}
+                        
+                    < /ul>
+                < /nav>
+    
+                < main>
+                    < h1>Bienvenido/a al Dashboard< /h1>                    
+                < /main>
+            < /div>
+            
+            
+    
+        < /body>
+        < /html>
+        </code>
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <p id="5">5. Mensajes Flashing (Exito, Error, Info)</p>
+    <pre>
+        <code>
+        from flask import Flask, redirect, url_for, request, render_template, \
+        flash
+    
+        con el \ podemos desbordar el código a la siguiente línea
+    
+        from flask import Flask, redirect, url_for, request, render_template, \
+        flash
+    
+        app = Flask(__name__)
+        app.config["SECRET_KEY"] = "so-secret!"
+    
+        @app.route("/")
+        def index():
+            #Importamos el render desde Flask y le pasamos el archivo que se encuentra en la carpeta templates
+            return render_template("index.html")
+    
+        @app.route("/contacto/")
+        def contact():
+            return """
+                < h1 style="font-size: 64px; color: blue">CONTACTO< /h1>
+            """
+    
+        @app.route("/nosotros/")
+        def about():
+            return """
+                < h1 style="font-size: 64px; color: blue">NOSOTROS< /h1>
+            """
+    
+        @app.route("/ejemplo")
+        def example():
+            return redirect(url_for("about"))
+    
+        @app.route("/login/", methods=["GET", "POST"])
+        def login():
+            if request.method == "POST":
+                username = request.form["username"]
+                password = request.form["password"]
+                print(username, password)
+                if username and password:
+                    return redirect(url_for("dashboard", name=username))
+                flash("Por favor ingresa correctamente tus datos.", "error")            
+                # flash("Por favor ingresa correctamente tus datos.", "success")            
+                # flash("Por favor ingresa correctamente tus datos.", "info")            
+                # Manejo de los mensajes Flash
+    
+            return render_template("login.html")
+    
+        @app.route("/profile/< name>/")
+        @app.route("/profile/")
+        def dashboard(name=None):
+            if name is not None:
+                flash(f"Bievenido/a {name}", "success")
+                return render_template("dashboard.html", username=name)
+            return redirect(url_for("login")) 
+        </code>
+        --------------------------------
+                            Manejamos los mensajes flash dentro del Html
+        <code>
+        < !DOCTYPE html>
+        < html lang="en">
+        < head>
+            < meta charset="UTF-8">
+            < meta http-equiv="X-UA-Compatible" content="IE=edge">
+            < meta name="viewport" content="width=device-width, initial-scale=1.0">
+            < title>Fundamentos de Flask< /title>
+            < link rel="stylesheet" href="{{ url_for ('static',filename='css/styles.css') }}">
+    
+        < /head>
+        < body>
+            <!-- menu -->
+            < div class="container">
+                < nav class="menu">
+                    < img src="{{url_for('static', filename='imgs/flask.png') }}" alt="flask" width="75" height="75">
+                    < ul class="menu-links">
+                        < li>< a href="">Inicio< /a>< /li>
+                        < li>< a href="">Contacto< /a>< /li>
+                        < li>< a href="">Nosotros< /a>< /li>
+                    
+                        {% if username %}
+                            < li>< a href="">{{ username }}< /a>< /li>
+                            < li>< a href="">Logout< /a>< /li>
+                        {% else %}
+                            < li>< a href="">Ingresar< /a>< /li>
+                            < li>< a href="">Registrarse< /a>< /li>
+                        {% endif %}
+    
+                    < /ul>
+                < /nav>
+    
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        < ul class="messages">
+                            {% for message in messages %}
+                                < li class="success">{{message}}< /li>
+                            {% endfor %}
+                        < /ul>
+                    {% endif %}
+                {% endwith %}
+    
+                < main>
+                    < h1>Bienvenido/a al Dashboard< /h1>                    
+                < /main>
+            < /div>
+            
+            
+    
+        < /body>
+        < /html>
+    </code>
+    </pre>
+
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+    <p id="6">6. Heredando Plantillas Html (DRY)</p>
+    <pre>
+        Un bloque sirve para heredar data de una plantilla hacia nuestra plantilla.
+
+        Ejemplo desde un archivo base.html:
+        <code>
+        < main>
+            {% block content %}
+                                    
+            {% endblock content %}
+        < /main>
+        </code>
+        
+        Desde otro archivo dashboard.html: 
+        <code>
+        {% block content %}
+            < h1>Fundamentos de Flask< /h1>                        
+        {% endblock content %}
+        </code>
+        Podemos entonces incorporar data desde varias archivos de manera dinámica
+    </pre>
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="#arriba">Arriba</a>
+    </div>
+    <br>
+    <br>
+
+    
+    <br> 
+    <br> 
+    <div class="context">
+        <a href="../2/index.html">Volver</a>
+        <a href="../../index.html">Inicio</a>
+        <a href="../4/index.html">Siguiente</a>
+    </div>
+</body>
+</html>
